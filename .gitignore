@@ -1,0 +1,16 @@
+#Unity
+/.vs
+/Library
+/Temp
+/obj
+/*.csproj
+/*.pidb
+/*.sln
+/*.sln.DotSettings
+/*.suo
+/*.unityproj
+/*.userprefs
+
+#Mac
+.DS_Store
+
