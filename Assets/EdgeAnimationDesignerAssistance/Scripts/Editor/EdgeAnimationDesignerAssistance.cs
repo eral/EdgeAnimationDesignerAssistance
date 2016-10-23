@@ -89,7 +89,7 @@ namespace EdgeAnimationDesignerAssistance {
 												, config.meshType
 												);
 
-						sprite.name = pattern.name + "#" + i;
+						sprite.name = pattern.name + "#" + (i + 1);
 						SaveSprite(sprite, pattern.name, i);
 					}
 				}
