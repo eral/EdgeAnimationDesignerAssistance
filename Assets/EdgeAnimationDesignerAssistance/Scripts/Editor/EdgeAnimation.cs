@@ -108,7 +108,7 @@ namespace EdgeAnimationDesignerAssistance {
 			return result;
 		}
 
-		public static void FromFileSetParameter(EdgeAnimation src, string key, string value) {
+		private static void FromFileSetParameter(EdgeAnimation src, string key, string value) {
 			switch (key) {
 			case "ANIME_VERSION":
 				src.animeVersion = int.Parse(value);
