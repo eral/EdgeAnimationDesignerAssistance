@@ -35,24 +35,25 @@ namespace EdgeAnimationDesignerAssistance {
 			m_UserData = serializedObject.FindProperty("m_UserData");
 		}
 
+		protected override void Apply() {
+			var settings = new EdgeAnimationImportSettings{
+									frameRate = m_FrameRate.intValue,
+									anchor = m_Anchor.vector2Value,
+									pixelsPerUnit = m_PixelsPerUnit.floatValue,
+									extrude = (uint)m_Extrude.intValue,
+									meshType = (SpriteMeshType)m_MeshType.intValue,
+								};
+			m_UserData.stringValue = JsonUtility.ToJson(settings);
+			serializedObject.ApplyModifiedProperties();
+		}
+
 		public override void OnInspectorGUI() {
 //			serializedObject.Update();
-			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(m_FrameRate, m_FrameRateContent);
 			EditorGUILayout.PropertyField(m_Anchor, m_AnchorContent);
 			EditorGUILayout.PropertyField(m_PixelsPerUnit, m_PixelsPerUnitContent);
 			EditorGUILayout.PropertyField(m_Extrude, m_ExtrudeContent);
 			EditorGUILayout.PropertyField(m_MeshType, m_MeshTypeContent);
-			if (EditorGUI.EndChangeCheck()) {
-				var settings = new EdgeAnimationImportSettings{
-										frameRate = m_FrameRate.intValue,
-										anchor = m_Anchor.vector2Value,
-										pixelsPerUnit = m_PixelsPerUnit.floatValue,
-										extrude = (uint)m_Extrude.intValue,
-										meshType = (SpriteMeshType)m_MeshType.intValue,
-									};
-				m_UserData.stringValue = JsonUtility.ToJson(settings);
-			}
 			ApplyRevertGUI();
 		}
 	}
