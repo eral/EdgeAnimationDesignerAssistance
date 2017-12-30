@@ -48,7 +48,6 @@ namespace EdgeAnimationDesignerAssistance {
 		}
 
 		public override void OnInspectorGUI() {
-//			serializedObject.Update();
 			EditorGUILayout.PropertyField(m_FrameRate, m_FrameRateContent);
 			EditorGUILayout.PropertyField(m_Anchor, m_AnchorContent);
 			EditorGUILayout.PropertyField(m_PixelsPerUnit, m_PixelsPerUnitContent);
