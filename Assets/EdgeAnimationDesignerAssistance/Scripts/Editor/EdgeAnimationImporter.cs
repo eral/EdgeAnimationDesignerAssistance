@@ -13,11 +13,26 @@ using System.Linq;
 namespace EdgeAnimationDesignerAssistance {
 	[ScriptedImporter(1, "anm")]
 	public class EdgeAnimationImporter : ScriptedImporter {
-		public int frameRate = 60;
-		public Vector2 anchor = new Vector2(0.5f, 0.5f);
-		public float pixelsPerUnit = 100.0f;
-		public uint extrude = 0;
-		public SpriteMeshType meshType = SpriteMeshType.Tight;
+		[System.Serializable]
+		public struct EdgeAnimationImportSettings {
+			public int frameRate;
+			public Vector2 anchor;
+			public float pixelsPerUnit;
+			public uint extrude;
+			public SpriteMeshType meshType;
+
+			public static EdgeAnimationImportSettings Default {get{
+				return new EdgeAnimationImportSettings{
+					frameRate = 60,
+					anchor = new Vector2(0.5f, 0.5f),
+					pixelsPerUnit = 100.0f,
+					extrude = 0,
+					meshType = SpriteMeshType.Tight
+				};
+			}}
+		}
+
+		public EdgeAnimationImportSettings settings;
 
 		public override void OnImportAsset(AssetImportContext ctx) {
 			this.ctx = ctx;
@@ -42,17 +57,11 @@ namespace EdgeAnimationDesignerAssistance {
 		private List<AnimationClip> clipCache;
 
 		private void SetImportSettings() {
-			EdgeAnimationImportSettings settings;
 			if (string.IsNullOrEmpty(userData)) {
-				settings = new EdgeAnimationImportSettings();
+				settings = EdgeAnimationImportSettings.Default;
 			} else {
 				settings = JsonUtility.FromJson<EdgeAnimationImportSettings>(userData);
 			}
-			frameRate = settings.frameRate;
-			anchor = settings.anchor;
-			pixelsPerUnit = settings.pixelsPerUnit;
-			extrude = settings.extrude;
-			meshType = settings.meshType;
 		}
 
 		private void CreateSprite() {
@@ -63,13 +72,13 @@ namespace EdgeAnimationDesignerAssistance {
 					var texture = LoadTexture(frame.filename);
 					var rect = new Rect(frame.srcX, texture.height - frame.srcY - frame.height, frame.width, frame.height);
 					var offset = new Vector2(frame.destX / (float)frame.width, -frame.destY / (float)frame.height);
-					var pivot = this.anchor - offset;
+					var pivot = settings.anchor - offset;
 					var sprite = Sprite.Create(texture
 											, rect
 											, pivot
-											, this.pixelsPerUnit
-											, this.extrude
-											, this.meshType
+											, settings.pixelsPerUnit
+											, settings.extrude
+											, settings.meshType
 											);
 
 					sprite.name = pattern.name + "#" + (i + 1);
@@ -168,7 +177,7 @@ namespace EdgeAnimationDesignerAssistance {
 				}
 				AnimationUtility.SetObjectReferenceCurve(clip, EditorCurveBinding.PPtrCurve(string.Empty, typeof(SpriteRenderer), "m_Sprite"), keyframes);
 
-				clip.frameRate = this.frameRate;
+				clip.frameRate = this.settings.frameRate;
 				var settings = new AnimationClipSettings();
 				settings.loopTime = true;
 				settings.stopTime = totalDelay * 0.001f;
