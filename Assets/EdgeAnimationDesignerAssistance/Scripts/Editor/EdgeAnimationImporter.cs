@@ -36,6 +36,9 @@ namespace EdgeAnimationDesignerAssistance {
 			m_ClipCache = null;
 		}
 
+		private static readonly Vector3 kStateCenterPositon = new Vector3(408.0f, 96.0f, 0.0f);
+		private const float kStateHeight = 48.0f;
+
 		[SerializeField]
 		private int m_FrameRate = 60;
 
@@ -200,44 +203,32 @@ namespace EdgeAnimationDesignerAssistance {
 		private void CreateAnimatorController() {
 			var controller = new AnimatorController();
 			controller.name = "Controller";
-			SaveAnimatorController(controller);
 			controller.AddParameter("Pattern", AnimatorControllerParameterType.Int);
 
-//			var stateMachine = new AnimatorStateMachine();
-//			stateMachine.name = "Base Layer";
-//			SaveAnimatorStateMachine(stateMachine);
-
-//			var layer = new AnimatorControllerLayer();
-//			layer.name = "Base Layer";
-//			layer.stateMachine = stateMachine;
-//			controller.AddLayer(layer);
 			controller.AddLayer("Base Layer");
 			var stateMachine = controller.layers[0].stateMachine;
 			SaveAnimatorStateMachine(stateMachine);
 			
-			var statePositon = new Vector3(408.0f, 72.0f, 0.0f);
-			var statePositonOffset = 48.0f;
-			statePositon.y -= statePositonOffset * ((int)m_ClipCache.Count / 2);
-//			var anyStateTransitions = new AnimatorStateTransition[m_ClipCache.Count];
+			var statePositon = kStateCenterPositon;
+			statePositon.y -= kStateHeight * 0.5f * m_ClipCache.Count;
 			for (int i = 0, iMax = m_ClipCache.Count; i < iMax; ++i) {
 				var clip = m_ClipCache[i];
-//				var state = new AnimatorState();
-//				state.name = clip.name + " State";
 				var state = stateMachine.AddState(clip.name + " State", statePositon);
-				SaveAnimatorState(state);
 				state.motion = clip;
-//				stateMachine.AddState(state, statePositon);
-//				var transition = new AnimatorStateTransition();
+				SaveAnimatorState(state);
+
 				var transition = stateMachine.AddAnyStateTransition(state);
 				transition.name = clip.name + " Transition";
-				SaveAnimatorTransition(transition);
-//				transition.destinationState = state;
 				transition.AddCondition(AnimatorConditionMode.Equals, i, "Pattern");
-//				anyStateTransitions[i] = transition;
+				transition.duration = 0.0f;
+				transition.offset = 0.0f;
+				transition.exitTime = 1.0f;
+				transition.canTransitionToSelf = false;
+				SaveAnimatorTransition(transition);
 
-				statePositon.y += statePositonOffset;
+				statePositon.y += kStateHeight;
 			}
-//			stateMachine.anyStateTransitions = anyStateTransitions;
+			SaveAnimatorController(controller);
 		}
 
 		private void SaveAnimatorController(AnimatorController controller) {
@@ -247,17 +238,17 @@ namespace EdgeAnimationDesignerAssistance {
 		}
 
 		private void SaveAnimatorStateMachine(AnimatorStateMachine stateMachine) {
-			stateMachine.hideFlags |= HideFlags.NotEditable;// | HideFlags.HideInHierarchy;
+			stateMachine.hideFlags |= HideFlags.NotEditable;
 			m_Ctx.AddObjectToAsset(stateMachine.name, stateMachine);
 		}
 
 		private void SaveAnimatorState(AnimatorState state) {
-			state.hideFlags |= HideFlags.NotEditable;// | HideFlags.HideInHierarchy;;
+			state.hideFlags |= HideFlags.NotEditable;
 			m_Ctx.AddObjectToAsset(state.name, state);
 		}
 
 		private void SaveAnimatorTransition(AnimatorStateTransition transition) {
-			transition.hideFlags |= HideFlags.NotEditable;// | HideFlags.HideInHierarchy;;
+			transition.hideFlags |= HideFlags.NotEditable;
 			m_Ctx.AddObjectToAsset(transition.name, transition);
 		}
 	}
