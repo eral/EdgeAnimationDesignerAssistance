@@ -24,16 +24,16 @@ namespace EdgeAnimationDesignerAssistance {
 		private int[] m_MeshTypeOptionValues;
 
 		public override void OnEnable() {
-			m_FrameRateContent = new GUIContent("Frame Rate");
 			m_FrameRate = serializedObject.FindProperty("m_FrameRate");
-			m_AnchorContent = new GUIContent("Anchor");
+			m_FrameRateContent = new GUIContent(m_FrameRate.displayName);
 			m_Anchor = serializedObject.FindProperty("m_Anchor");
-			m_PixelsPerUnitContent = new GUIContent("Pixels Per Unit");
+			m_AnchorContent = new GUIContent(m_Anchor.displayName);
 			m_PixelsPerUnit = serializedObject.FindProperty("m_PixelsPerUnit");
-			m_ExtrudeContent = new GUIContent("Extrude");
+			m_PixelsPerUnitContent = new GUIContent(m_PixelsPerUnit.displayName);
 			m_Extrude = serializedObject.FindProperty("m_Extrude");
-			m_MeshTypeContent = new GUIContent("Mesh Type");
+			m_ExtrudeContent = new GUIContent(m_Extrude.displayName);
 			m_MeshType = serializedObject.FindProperty("m_MeshType");
+			m_MeshTypeContent = new GUIContent(m_MeshType.displayName);
 			m_MeshTypeDisplayedOptions = System.Enum.GetNames(typeof(SpriteMeshType)).Select(x=>new GUIContent(x)).ToArray();
 			m_MeshTypeOptionValues = (int[])System.Enum.GetValues(typeof(SpriteMeshType));
 		}
