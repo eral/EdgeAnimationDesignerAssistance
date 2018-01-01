@@ -22,15 +22,15 @@ namespace EdgeAnimationDesignerAssistance {
 
 		public override void OnEnable() {
 			m_FrameRateContent = new GUIContent("Frame Rate");
-			m_FrameRate = serializedObject.FindProperty("frameRate");
+			m_FrameRate = serializedObject.FindProperty("m_FrameRate");
 			m_AnchorContent = new GUIContent("Anchor");
-			m_Anchor = serializedObject.FindProperty("anchor");
+			m_Anchor = serializedObject.FindProperty("m_Anchor");
 			m_PixelsPerUnitContent = new GUIContent("Pixels Per Unit");
-			m_PixelsPerUnit = serializedObject.FindProperty("pixelsPerUnit");
+			m_PixelsPerUnit = serializedObject.FindProperty("m_PixelsPerUnit");
 			m_ExtrudeContent = new GUIContent("Extrude");
-			m_Extrude = serializedObject.FindProperty("extrude");
+			m_Extrude = serializedObject.FindProperty("m_Extrude");
 			m_MeshTypeContent = new GUIContent("Mesh Type");
-			m_MeshType = serializedObject.FindProperty("meshType");
+			m_MeshType = serializedObject.FindProperty("m_MeshType");
 		}
 
 		public override void OnInspectorGUI() {

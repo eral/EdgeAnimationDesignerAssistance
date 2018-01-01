@@ -13,48 +13,72 @@ using System.Linq;
 namespace EdgeAnimationDesignerAssistance {
 	[ScriptedImporter(1, "anm")]
 	public class EdgeAnimationImporter : ScriptedImporter {
-		public int frameRate = 60;
-		public Vector2 anchor = new Vector2(0.5f, 0.5f);
-		public float pixelsPerUnit = 100.0f;
-		public uint extrude = 0;
-		public SpriteMeshType meshType = SpriteMeshType.Tight;
+		public int frameRate {get{return m_FrameRate;} set{m_FrameRate = value;}}
+		public Vector2 anchor {get{return m_Anchor;} set{m_Anchor = value;}}
+		public float pixelsPerUnit {get{return m_PixelsPerUnit;} set{m_PixelsPerUnit = value;}}
+		public uint extrude {get{return m_Extrude;} set{m_Extrude = value;}}
+		public SpriteMeshType meshType {get{return m_MeshType;} set{m_MeshType = value;}}
 
 		public override void OnImportAsset(AssetImportContext ctx) {
-			this.ctx = ctx;
-			edgeAnm = EdgeAnimation.FromFile(Application.dataPath + "/../" + this.ctx.assetPath);
-			textureCache = new Dictionary<string, Texture2D>();
-			spriteCache = new Dictionary<string, List<Sprite>>();
-			clipCache = new List<AnimationClip>();
+			m_Ctx = ctx;
+			m_EdgeAnm = EdgeAnimation.FromFile(Application.dataPath + "/../" + m_Ctx.assetPath);
+			m_TextureCache = new Dictionary<string, Texture2D>();
+			m_SpriteCache = new Dictionary<string, List<Sprite>>();
+			m_ClipCache = new List<AnimationClip>();
 
 			CreateSprite();
 			CreateAnimationClip();
 
-			textureCache = null;
-			spriteCache = null;
-			clipCache = null;
+			m_TextureCache = null;
+			m_SpriteCache = null;
+			m_ClipCache = null;
 		}
 
-		private AssetImportContext ctx;
-		private EdgeAnimation edgeAnm;
-		private Dictionary<string, Texture2D> textureCache;
-		private Dictionary<string, List<Sprite>> spriteCache;
-		private List<AnimationClip> clipCache;
+		[SerializeField]
+		private int m_FrameRate = 60;
+
+		[SerializeField]
+		private Vector2 m_Anchor = new Vector2(0.5f, 0.5f);
+
+		[SerializeField]
+		private float m_PixelsPerUnit = 100.0f;
+
+		[SerializeField]
+		private uint m_Extrude = 0;
+
+		[SerializeField]
+		private SpriteMeshType m_MeshType = SpriteMeshType.Tight;
+
+		[System.NonSerialized]
+		private AssetImportContext m_Ctx;
+
+		[System.NonSerialized]
+		private EdgeAnimation m_EdgeAnm;
+
+		[System.NonSerialized]
+		private Dictionary<string, Texture2D> m_TextureCache;
+
+		[System.NonSerialized]
+		private Dictionary<string, List<Sprite>> m_SpriteCache;
+
+		[System.NonSerialized]
+		private List<AnimationClip> m_ClipCache;
 
 		private void CreateSprite() {
-			foreach (var pattern in edgeAnm.patterns) {
+			foreach (var pattern in m_EdgeAnm.patterns) {
 				for (int i = 0, iMax = pattern.frames.Count; i < iMax; ++i) {
 					var frame = pattern.frames[i];
 
 					var texture = LoadTexture(frame.filename);
 					var rect = new Rect(frame.srcX, texture.height - frame.srcY - frame.height, frame.width, frame.height);
 					var offset = new Vector2(frame.destX / (float)frame.width, -frame.destY / (float)frame.height);
-					var pivot = anchor - offset;
+					var pivot = m_Anchor - offset;
 					var sprite = Sprite.Create(texture
 											, rect
 											, pivot
-											, pixelsPerUnit
-											, extrude
-											, meshType
+											, m_PixelsPerUnit
+											, m_Extrude
+											, m_MeshType
 											);
 
 					sprite.name = pattern.name + "#" + (i + 1);
@@ -68,13 +92,13 @@ namespace EdgeAnimationDesignerAssistance {
 		}
 
 		private Texture2D LoadTexture(string path) {
-			if (textureCache.ContainsKey(path)) {
-				return textureCache[path];
+			if (m_TextureCache.ContainsKey(path)) {
+				return m_TextureCache[path];
 			}
 
 			var filter = path.Replace('\\', '/')
 								.Substring(0, path.Length - Path.GetExtension(path).Length);
-			var searchInFolders = new[]{Path.GetDirectoryName(ctx.assetPath)};
+			var searchInFolders = new[]{Path.GetDirectoryName(m_Ctx.assetPath)};
 
 			while (true) {
 				while (true) {
@@ -85,7 +109,7 @@ namespace EdgeAnimationDesignerAssistance {
 											.Where(x=>x != null)
 											.ToArray();
 						var result = assets.FirstOrDefault();
-						textureCache.Add(path, result);
+						m_TextureCache.Add(path, result);
 						return result;
 					}
 
@@ -106,14 +130,14 @@ namespace EdgeAnimationDesignerAssistance {
 
 		private void SaveSprite(Sprite sprite, string patternName, int frameIndex) {
 			sprite.hideFlags |= HideFlags.NotEditable;
-			ctx.AddObjectToAsset(sprite.name, sprite);
+			m_Ctx.AddObjectToAsset(sprite.name, sprite);
 
 			List<Sprite> sprites;
-			if (spriteCache.ContainsKey(patternName)) {
-				sprites = spriteCache[patternName];
+			if (m_SpriteCache.ContainsKey(patternName)) {
+				sprites = m_SpriteCache[patternName];
 			} else {
 				sprites = new List<Sprite>();
-				spriteCache.Add(patternName, sprites);
+				m_SpriteCache.Add(patternName, sprites);
 			}
 			if (frameIndex < sprites.Count) {
 				sprites[frameIndex] = sprite;
@@ -125,10 +149,10 @@ namespace EdgeAnimationDesignerAssistance {
 		}
 
 		private Sprite LoadSprite(string pattern, int frameIndex) {
-			if (!spriteCache.ContainsKey(pattern)) {
+			if (!m_SpriteCache.ContainsKey(pattern)) {
 				throw new System.ArgumentOutOfRangeException();
 			}
-			var sprites = spriteCache[pattern];
+			var sprites = m_SpriteCache[pattern];
 			if (sprites.Count <= frameIndex) {
 				throw new System.IndexOutOfRangeException();
 			}
@@ -136,7 +160,7 @@ namespace EdgeAnimationDesignerAssistance {
 		}
 
 		private void CreateAnimationClip() {
-			foreach (var pattern in edgeAnm.patterns) {
+			foreach (var pattern in m_EdgeAnm.patterns) {
 				var clip = new AnimationClip();
 
 				var keyframes = new ObjectReferenceKeyframe[pattern.frames.Count];
@@ -153,7 +177,7 @@ namespace EdgeAnimationDesignerAssistance {
 				}
 				AnimationUtility.SetObjectReferenceCurve(clip, EditorCurveBinding.PPtrCurve(string.Empty, typeof(SpriteRenderer), "m_Sprite"), keyframes);
 
-				clip.frameRate = frameRate;
+				clip.frameRate = m_FrameRate;
 				var settings = new AnimationClipSettings();
 				settings.loopTime = true;
 				settings.stopTime = totalDelay * 0.001f;
@@ -167,8 +191,8 @@ namespace EdgeAnimationDesignerAssistance {
 
 		private void SaveAnimationClip(AnimationClip clip, string patternName) {
 			clip.hideFlags |= HideFlags.NotEditable;
-			ctx.AddObjectToAsset(clip.name, clip);
-			clipCache.Add(clip);
+			m_Ctx.AddObjectToAsset(clip.name, clip);
+			m_ClipCache.Add(clip);
 		}
 	}
 }
