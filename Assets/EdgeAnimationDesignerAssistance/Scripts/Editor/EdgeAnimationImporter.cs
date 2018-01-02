@@ -190,11 +190,11 @@ namespace EdgeAnimationDesignerAssistance {
 				AnimationUtility.SetAnimationClipSettings(clip, settings);
 
 				clip.name = pattern.name;
-				SaveAnimationClip(clip, pattern.name);
+				SaveAnimationClip(clip);
 			}
 		}
 
-		private void SaveAnimationClip(AnimationClip clip, string patternName) {
+		private void SaveAnimationClip(AnimationClip clip) {
 			clip.hideFlags |= HideFlags.NotEditable;
 			m_Ctx.AddObjectToAsset(clip.name, clip);
 			m_ClipCache.Add(clip);
