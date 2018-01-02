@@ -6,7 +6,7 @@ EDGE(Enhanced Dot Graphics Editor)のアニメーションをUnityのスプラ�
 ## 使い方
 1. [EdgeAnimationDesignerAssistance](https://github.com/eral/EdgeAnimationDesignerAssistance/releases)をダウンロード・インストール
 1. EDGEのアニメーションファイル(anm)と参照している画像ファイルをUnityにD&D
-1. 同階層に同名ファイルでスプライト・アニメーションが生成される
+1. インポートに伴いスプライト・アニメーションが生成される
 
 
 ## LICENSE
