@@ -30,10 +30,12 @@ namespace EdgeAnimationDesignerAssistance {
 			CreateSprite();
 			CreateAnimationClip();
 			CreateAnimatorController();
+			CreateMainObject();
 
 			m_TextureCache = null;
 			m_SpriteCache = null;
 			m_ClipCache = null;
+			m_ControllerCache = null;
 		}
 
 		private static readonly Vector3 kStateCenterPositon = new Vector3(408.0f, 96.0f, 0.0f);
@@ -68,6 +70,9 @@ namespace EdgeAnimationDesignerAssistance {
 
 		[System.NonSerialized]
 		private List<AnimationClip> m_ClipCache;
+
+		[System.NonSerialized]
+		private AnimatorController m_ControllerCache;
 
 		private void CreateSprite() {
 			foreach (var pattern in m_EdgeAnm.patterns) {
@@ -205,6 +210,17 @@ namespace EdgeAnimationDesignerAssistance {
 			SaveAsset(controller);
 		}
 
+		private void CreateMainObject() {
+			var go = new GameObject(string.Empty, typeof(SpriteRenderer), typeof(Animator));
+			var spriteRenderer = go.GetComponent<SpriteRenderer>();
+			spriteRenderer.sprite = m_SpriteCache[m_EdgeAnm.patterns[0].name][0];
+			var animator = go.GetComponent<Animator>();
+			animator.runtimeAnimatorController = m_ControllerCache;
+
+			SaveAsset(go);
+			m_Ctx.SetMainObject(go);
+		}
+
 		private void SaveAsset(Object asset) {
 			asset.hideFlags |= HideFlags.NotEditable;
 			m_Ctx.AddObjectToAsset(asset.name, asset);
@@ -236,7 +252,7 @@ namespace EdgeAnimationDesignerAssistance {
 
 		private void SaveAsset(AnimatorController controller) {
 			SaveAsset((Object)controller);
-			m_Ctx.SetMainObject(controller);
+			m_ControllerCache = controller;
 		}
 	}
 }
