@@ -87,7 +87,7 @@ namespace EdgeAnimationDesignerAssistance {
 											);
 
 					sprite.name = pattern.name + "#" + (i + 1);
-					SaveSprite(sprite, pattern.name, i);
+					SaveAsset(sprite, pattern.name, i);
 				}
 			}
 		}
@@ -133,26 +133,6 @@ namespace EdgeAnimationDesignerAssistance {
 			return null;
 		}
 
-		private void SaveSprite(Sprite sprite, string patternName, int frameIndex) {
-			sprite.hideFlags |= HideFlags.NotEditable;
-			m_Ctx.AddObjectToAsset(sprite.name, sprite);
-
-			List<Sprite> sprites;
-			if (m_SpriteCache.ContainsKey(patternName)) {
-				sprites = m_SpriteCache[patternName];
-			} else {
-				sprites = new List<Sprite>();
-				m_SpriteCache.Add(patternName, sprites);
-			}
-			if (frameIndex < sprites.Count) {
-				sprites[frameIndex] = sprite;
-			} else if (frameIndex == sprites.Count) {
-				sprites.Add(sprite);
-			} else {
-				throw new System.IndexOutOfRangeException();
-			}
-		}
-
 		private Sprite LoadSprite(string pattern, int frameIndex) {
 			if (!m_SpriteCache.ContainsKey(pattern)) {
 				throw new System.ArgumentOutOfRangeException();
@@ -190,14 +170,8 @@ namespace EdgeAnimationDesignerAssistance {
 				AnimationUtility.SetAnimationClipSettings(clip, settings);
 
 				clip.name = pattern.name;
-				SaveAnimationClip(clip);
+				SaveAsset(clip);
 			}
-		}
-
-		private void SaveAnimationClip(AnimationClip clip) {
-			clip.hideFlags |= HideFlags.NotEditable;
-			m_Ctx.AddObjectToAsset(clip.name, clip);
-			m_ClipCache.Add(clip);
 		}
 
 		private void CreateAnimatorController() {
@@ -207,7 +181,7 @@ namespace EdgeAnimationDesignerAssistance {
 
 			controller.AddLayer("Base Layer");
 			var stateMachine = controller.layers[0].stateMachine;
-			SaveAnimatorStateMachine(stateMachine);
+			SaveAsset(stateMachine);
 			
 			var statePositon = kStateCenterPositon;
 			statePositon.y -= kStateHeight * 0.5f * m_ClipCache.Count;
@@ -215,7 +189,7 @@ namespace EdgeAnimationDesignerAssistance {
 				var clip = m_ClipCache[i];
 				var state = stateMachine.AddState(clip.name + " State", statePositon);
 				state.motion = clip;
-				SaveAnimatorState(state);
+				SaveAsset(state);
 
 				var transition = stateMachine.AddAnyStateTransition(state);
 				transition.name = clip.name + " Transition";
@@ -224,32 +198,45 @@ namespace EdgeAnimationDesignerAssistance {
 				transition.offset = 0.0f;
 				transition.exitTime = 1.0f;
 				transition.canTransitionToSelf = false;
-				SaveAnimatorTransition(transition);
+				SaveAsset(transition);
 
 				statePositon.y += kStateHeight;
 			}
-			SaveAnimatorController(controller);
+			SaveAsset(controller);
 		}
 
-		private void SaveAnimatorController(AnimatorController controller) {
-			controller.hideFlags |= HideFlags.NotEditable;
-			m_Ctx.AddObjectToAsset(controller.name, controller);
+		private void SaveAsset(Object asset) {
+			asset.hideFlags |= HideFlags.NotEditable;
+			m_Ctx.AddObjectToAsset(asset.name, asset);
+		}
+
+		private void SaveAsset(Sprite sprite, string patternName, int frameIndex) {
+			SaveAsset(sprite);
+
+			List<Sprite> sprites;
+			if (m_SpriteCache.ContainsKey(patternName)) {
+				sprites = m_SpriteCache[patternName];
+			} else {
+				sprites = new List<Sprite>();
+				m_SpriteCache.Add(patternName, sprites);
+			}
+			if (frameIndex < sprites.Count) {
+				sprites[frameIndex] = sprite;
+			} else if (frameIndex == sprites.Count) {
+				sprites.Add(sprite);
+			} else {
+				throw new System.IndexOutOfRangeException();
+			}
+		}
+
+		private void SaveAsset(AnimationClip clip) {
+			SaveAsset((Object)clip);
+			m_ClipCache.Add(clip);
+		}
+
+		private void SaveAsset(AnimatorController controller) {
+			SaveAsset((Object)controller);
 			m_Ctx.SetMainObject(controller);
-		}
-
-		private void SaveAnimatorStateMachine(AnimatorStateMachine stateMachine) {
-			stateMachine.hideFlags |= HideFlags.NotEditable;
-			m_Ctx.AddObjectToAsset(stateMachine.name, stateMachine);
-		}
-
-		private void SaveAnimatorState(AnimatorState state) {
-			state.hideFlags |= HideFlags.NotEditable;
-			m_Ctx.AddObjectToAsset(state.name, state);
-		}
-
-		private void SaveAnimatorTransition(AnimatorStateTransition transition) {
-			transition.hideFlags |= HideFlags.NotEditable;
-			m_Ctx.AddObjectToAsset(transition.name, transition);
 		}
 	}
 }
